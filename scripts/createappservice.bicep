@@ -112,11 +112,11 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservice
         }		
         {
           name: 'KeystoneHasherKey'
-          value: service.settings.KeystoneHasherKey
+          value: string(service.settings.KeystoneHasherKey)
         }
         {
           name: 'OpenAIKey'
-          value: service.settings.OpenAIKey
+          value: string(service.settings.OpenAIKey)
         }		
       ]
     }
