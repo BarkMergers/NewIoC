@@ -40,7 +40,6 @@ jobs:
               --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
               --template-file ./scripts/createappservice.bicep \
               --name ${{ env.AZURE_DEPLOYMENT_NAME }} \
-              --location ${{ env.AZURE_LOCATION }}
               # Add parameters here if your Bicep file requires them
             echo "Bicep deployment completed."
 
