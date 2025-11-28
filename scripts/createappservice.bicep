@@ -48,7 +48,7 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
 
 // --- 3. Web App (Equivalent to 'az webapp create') ---
 resource webApp 'Microsoft.Web/sites@2022-09-01' = {
-  name: webAppName
+  name: webAppName2
   location: location
   // Link the Web App to the App Service Plan using the ID reference
   properties: {
