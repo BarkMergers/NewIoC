@@ -67,4 +67,4 @@ resource webApp2 'Microsoft.Web/sites@2022-09-01' = {
 
 
 
-output webAppUrl string = webApp.properties.defaultHostName
+output webAppUrl string = webApp1.properties.defaultHostName
