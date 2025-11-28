@@ -38,4 +38,5 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
 
 
 
+
 output webAppUrl string = webApp.properties.defaultHostName

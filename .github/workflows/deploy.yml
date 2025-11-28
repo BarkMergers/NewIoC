@@ -27,7 +27,7 @@ jobs:
         uses: azure/login@v2
         with:
           # This secret holds the JSON output you generated earlier
-          creds: ${{ secrets.AZURE_SECRET }}
+          creds: ${{ secrets.AZURE_AUTHENTICATE }}
 
       # 2. Deploy the Bicep file
       - name: Deploy Bicep File
