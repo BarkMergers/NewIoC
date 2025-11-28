@@ -17,6 +17,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   }
 }
 
+
 // --- 2. Web App (Equivalent to 'az webapp create') ---
 resource webApp 'Microsoft.Web/sites@2022-09-01' = {
   name: webAppName
