@@ -91,7 +91,9 @@ var microservices = [
 resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservices: {
   name: service.name 
   location: location
-  
+  identity: {
+    type: 'SystemAssigned' // This creates and enables the Managed Identity
+  }  
   properties: {
     serverFarmId: appServicePlan.id
     
@@ -121,12 +123,45 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservice
     }
     httpsOnly: true
   }
-  
 }]
 
 
 
 
+
+
+// Parameter for existing Key Vault name
+param keyVaultName string
+
+// Reference the existing Key Vault resource
+resource existingKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: keyVaultName
+}
+
+// --- Grant Key Vault Access Policy ---
+// Loop through all your web apps to grant access
+resource keyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2023-07-01' = [for (service, i) in microservices: {
+  name: 'add'
+  parent: existingKeyVault
+  properties: {
+    // The Web App Identity is automatically available here
+    objectId: webApps[i].identity.principalId // Use the principal ID of the specific Web App
+    tenantId: subscription().tenantId
+    
+    // Define the permissions needed (read secrets)
+    accessPolicies: [
+      {
+        tenantId: subscription().tenantId
+        objectId: webApps[i].identity.principalId
+        permissions: {
+          secrets: [
+            'get' // Only need 'get' to read secrets referenced in app settings
+          ]
+        }
+      }
+    ]
+  }
+}]
 
 
 
