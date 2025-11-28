@@ -34,6 +34,10 @@ var microservices = [
     port: 8080
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
+	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
+	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
+	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
+	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
   {
@@ -41,6 +45,10 @@ var microservices = [
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
+	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
+	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
+	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
+	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
   {
@@ -48,6 +56,10 @@ var microservices = [
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
+	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
+	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
+	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
+	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
   {
@@ -55,6 +67,10 @@ var microservices = [
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
+	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
+	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
+	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
+	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
   {
@@ -62,6 +78,10 @@ var microservices = [
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
+	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
+	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
+	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
+	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
   {
@@ -80,6 +100,10 @@ var microservices = [
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
+	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
+	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
+	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
+	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
 ]
@@ -90,25 +114,26 @@ var microservices = [
 
 
 // --- 2. Web App Iteration (Equivalent to 'az webapp create') ---
-resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservices: { // <--- The 'for' Loop
-  name: service.name // Unique name from the array object
+resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservices: {
+  name: service.name 
   location: location
   
   properties: {
-    serverFarmId: appServicePlan.id // Reference the shared plan ID
+    serverFarmId: appServicePlan.id
     
     siteConfig: {
       linuxFxVersion: dotnetVersion
       minTlsVersion: '1.2'
-      // Example of custom app settings from the array object
+
+
       appSettings: [
         {
           name: 'KeystoneDBConnection'
-          value: string(service.KeystoneDBConnection)
+          value: string(service.settings.KeystoneDBConnection)
         }
         {
           name: 'MaintenanceDBConnection'
-          value: string(service.MaintenanceDBConnection)
+          value: string(service.settings.MaintenanceDBConnection)
         }		
         {
           name: 'KeystoneHasherKey'
@@ -123,9 +148,6 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservice
     httpsOnly: true
   }
   
-  // NOTE: Bicep automatically handles the dependency on appServicePlan 
-  // because you reference its property (appServicePlan.id).
-  // The 'dependsOn' is usually unnecessary here and can be removed (as per the linter warning you saw earlier).
 }]
 
 
