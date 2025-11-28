@@ -1,0 +1,49 @@
+name: Deploy Azure App Service Bicep
+
+on:
+  push:
+    branches:
+      - main # Or 'master', depending on your default branch name
+    paths:
+      - 'scripts/createappservice.bicep' # This ensures the workflow only runs when this specific file changes
+
+env:
+  # Define variables for easy reuse and maintenance
+  AZURE_RESOURCE_GROUP: 'Test_IOC'
+  AZURE_LOCATION: 'ukwest' # Change this to your desired Azure region
+  AZURE_DEPLOYMENT_NAME: 'deploy-${{ github.sha }}' # Use a unique name based on the commit hash
+
+jobs:
+  deploy-bicep:
+    runs-on: ubuntu-latest
+    environment: Production # Optional: Use an environment for protection rules
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # 1. Log in to Azure using the Service Principal credentials
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          # This secret holds the JSON output you generated earlier
+          creds: ${{ secrets.AZURE_SECRET }}
+
+      # 2. Deploy the Bicep file
+      - name: Deploy Bicep File
+        uses: azure/cli@v2
+        with:
+          inlineScript: |
+            echo "Starting Bicep deployment for ${{ env.AZURE_RESOURCE_GROUP }}..."
+            # Command to deploy the Bicep template
+            az deployment group create \
+              --resource-group ${{ env.AZURE_RESOURCE_GROUP }} \
+              --template-file ./scripts/createappservice.bicep \
+              --name ${{ env.AZURE_DEPLOYMENT_NAME }} \
+              --location ${{ env.AZURE_LOCATION }}
+              # Add parameters here if your Bicep file requires them
+            echo "Bicep deployment completed."
+
+      # 3. (Optional) Log out of Azure
+      - name: Azure Logout
+        run: az logout
