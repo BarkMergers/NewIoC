@@ -6,6 +6,7 @@ param dotnetVersion string = 'DOTNET|9.0' // Specification for .NET 9 on Linux
 
 
 
+
 // --- 1. App Service Plan (Equivalent to 'az appservice plan create') ---
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
