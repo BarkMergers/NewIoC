@@ -23,48 +23,74 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 
 
 
-// --- 2. Web App (Equivalent to 'az webapp create') ---
-resource webApp1 'Microsoft.Web/sites@2022-09-01' = {
-  name: webAppName1
+
+
+// Common Parameters
+param location string = resourceGroup().location
+//param appServicePlanId string // ID of your single App Service Plan
+
+// Common Variable: Set the .NET runtime version
+var dotnetVersion = 'DOTNET|9.0'
+
+// --- Microservice Configuration Array ---
+// Define the unique properties for each of the 5 microservices
+var microservices = [
+  {
+    name: 'Microservice-A'
+    port: 8080
+    settings: {
+      ASPNETCORE_ENVIRONMENT: 'Production'
+    }
+  }
+  {
+    name: 'Microservice-B'
+    port: 8081
+    settings: {
+      ASPNETCORE_ENVIRONMENT: 'Staging'
+    }
+  }
+]
+
+
+
+
+// --- 2. Web App Iteration (Equivalent to 'az webapp create') ---
+resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservices: { // <--- The 'for' Loop
+  name: service.name // Unique name from the array object
   location: location
-  // Link the Web App to the App Service Plan using the ID reference
+  
   properties: {
-    serverFarmId: appServicePlan.id
-    // Set the runtime stack for the web app (e.g., DOTNET|9.0 on Linux)
+    serverFarmId: appServicePlan.id // Reference the shared plan ID
+    
     siteConfig: {
       linuxFxVersion: dotnetVersion
       minTlsVersion: '1.2'
+      // Example of custom app settings from the array object
+      appSettings: [
+        {
+          name: 'CUSTOM_PORT'
+          value: string(service.port)
+        }
+        {
+          name: 'ASPNETCORE_ENVIRONMENT'
+          value: service.settings.ASPNETCORE_ENVIRONMENT
+        }
+      ]
     }
     httpsOnly: true
   }
-  dependsOn: [ // Explicit dependency ensures the plan exists before the app is created
-    appServicePlan
-  ]
-}
+  
+  // NOTE: Bicep automatically handles the dependency on appServicePlan 
+  // because you reference its property (appServicePlan.id).
+  // The 'dependsOn' is usually unnecessary here and can be removed (as per the linter warning you saw earlier).
+}]
 
 
 
 
 
-// --- 3. Web App (Equivalent to 'az webapp create') ---
-resource webApp2 'Microsoft.Web/sites@2022-09-01' = {
-  name: webAppName2
-  location: location
-  // Link the Web App to the App Service Plan using the ID reference
-  properties: {
-    serverFarmId: appServicePlan.id
-    // Set the runtime stack for the web app (e.g., DOTNET|9.0 on Linux)
-    siteConfig: {
-      linuxFxVersion: dotnetVersion
-      minTlsVersion: '1.2'
-    }
-    httpsOnly: true
-  }
-  dependsOn: [ // Explicit dependency ensures the plan exists before the app is created
-    appServicePlan
-  ]
-}
 
 
 
-output webAppUrl string = webApp1.properties.defaultHostName
+
+// output webAppUrl string = webApp1.properties.defaultHostName
