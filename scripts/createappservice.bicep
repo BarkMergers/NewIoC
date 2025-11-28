@@ -69,6 +69,10 @@ var microservices = [
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
+	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
+	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
+	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
+	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
   {
@@ -99,13 +103,21 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservice
       // Example of custom app settings from the array object
       appSettings: [
         {
-          name: 'CUSTOM_PORT'
-          value: string(service.port)
+          name: 'KeystoneDBConnection'
+          value: string(service.KeystoneDBConnection)
         }
         {
-          name: 'ASPNETCORE_ENVIRONMENT'
-          value: service.settings.ASPNETCORE_ENVIRONMENT
+          name: 'MaintenanceDBConnection'
+          value: string(service.MaintenanceDBConnection)
+        }		
+        {
+          name: 'KeystoneHasherKey'
+          value: service.settings.KeystoneHasherKey
         }
+        {
+          name: 'OpenAIKey'
+          value: service.settings.OpenAIKey
+        }		
       ]
     }
     httpsOnly: true
