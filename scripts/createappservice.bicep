@@ -26,11 +26,11 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 
 
 // Common Parameters
-param location string = resourceGroup().location
+//param location string = resourceGroup().location
 //param appServicePlanId string // ID of your single App Service Plan
 
 // Common Variable: Set the .NET runtime version
-var dotnetVersion = 'DOTNET|9.0'
+//var dotnetVersion = 'DOTNET|9.0'
 
 // --- Microservice Configuration Array ---
 // Define the unique properties for each of the 5 microservices
