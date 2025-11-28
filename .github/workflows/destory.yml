@@ -1,0 +1,27 @@
+name: Destroy Environment
+
+on:
+  workflow_dispatch: # Allows manual triggering from the GitHub UI
+
+jobs:
+  destroy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Delete Resource Group
+        uses: azure/cli@v2
+        with:
+          inlineScript: |
+            echo "Deleting Resource Group Test_IOC..."
+            # --yes bypasses the confirmation prompt
+            # --no-wait returns immediately, allowing Azure to delete the group in the background
+            az group delete --name Test_IOC --yes --no-wait
+            echo "Resource Group deletion started."
+
+      - name: Azure Logout
+        run: az logout

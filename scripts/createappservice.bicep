@@ -4,6 +4,8 @@ param location string = resourceGroup().location
 param skuName string = 'B1' // B1 = Basic tier, size 1
 param dotnetVersion string = 'DOTNET|9.0' // Specification for .NET 9 on Linux
 
+
+
 // --- 1. App Service Plan (Equivalent to 'az appservice plan create') ---
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
@@ -16,6 +18,8 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
     reserved: true // Required for Linux plans
   }
 }
+
+
 
 
 // --- 2. Web App (Equivalent to 'az webapp create') ---
