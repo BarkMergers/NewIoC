@@ -141,7 +141,7 @@ resource existingKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
 // --- Grant Key Vault Access Policy ---
 // Loop through all your web apps to grant access
 resource keyVaultAccessPolicy 'Microsoft.KeyVault/vaults/accessPolicies@2023-07-01' = [for (service, i) in microservices: {
-  name: 'add'
+  name: 'add-policy-${i}'
   parent: existingKeyVault
   properties: {
     // The Web App Identity is automatically available here
