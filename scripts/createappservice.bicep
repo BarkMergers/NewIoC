@@ -1,5 +1,3 @@
-param webAppName1 string = 'MicroGateway3'
-param webAppName2 string = 'MicroAgent3'
 param appServicePlanName string = 'MicroPlan3'
 param location string = resourceGroup().location
 param skuName string = 'B1' // B1 = Basic tier, size 1
@@ -23,7 +21,10 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 
 
 
-
+param KeystoneDBConnection string = '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
+param MaintenanceDBConnection string = '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
+param KeystoneHasherKey string = '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
+param OpenAIKey string = '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
 
 
 
@@ -34,76 +35,48 @@ var microservices = [
     port: 8080
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
-	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
-	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
-	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
-	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
   {
-    name: 'MicroAccount'
+    name: 'MicroAccount3'
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
-	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
-	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
-	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
-	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
   {
-    name: 'MicroAgent'
+    name: 'MicroAgent3'
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
-	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
-	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
-	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
-	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
   {
-    name: 'MicroAsset'
+    name: 'MicroAsset3'
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
-	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
-	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
-	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
-	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
   {
-    name: 'MicroCustomer'
+    name: 'MicroCustomer3'
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
-	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
-	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
-	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
-	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
   {
-    name: 'MicroFines'
+    name: 'MicroFines3'
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
-	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
-	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
-	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
-	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
   {
-    name: 'MicroTenant'
+    name: 'MicroTenant3'
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
-	  KeystoneDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
-	  MaintenanceDBConnection: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
-	  KeystoneHasherKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
-	  OpenAIKey: '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
     }
   }
 ]
@@ -115,7 +88,6 @@ var microservices = [
 
 
 
-// --- 2. Web App Iteration (Equivalent to 'az webapp create') ---
 resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservices: {
   name: service.name 
   location: location
@@ -131,19 +103,19 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservice
       appSettings: [
         {
           name: 'KeystoneDBConnection'
-          value: string(service.settings.KeystoneDBConnection)
+          value: string(KeystoneDBConnection)
         }
         {
           name: 'MaintenanceDBConnection'
-          value: string(service.settings.MaintenanceDBConnection)
+          value: string(MaintenanceDBConnection)
         }		
         {
           name: 'KeystoneHasherKey'
-          value: string(service.settings.KeystoneHasherKey)
+          value: string(KeystoneHasherKey)
         }
         {
           name: 'OpenAIKey'
-          value: string(service.settings.OpenAIKey)
+          value: string(OpenAIKey)
         }		
       ]
     }
