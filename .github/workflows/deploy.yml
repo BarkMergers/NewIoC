@@ -28,8 +28,19 @@ jobs:
         with:
           # This secret holds the JSON output you generated earlier
           creds: ${{ secrets.AZURE_AUTHENTICATE }}
+          
+          
+      # 2. Make the resource group         
+      - name: ⚙️ Create or Update Resource Group
+        uses: azure/cli@v1
+        with:
+          inlineScript: |
+            az group create \
+              --name ${{ env.AZURE_RESOURCE_GROUP }} \
+              --location ${{ env.AZURE_LOCATION }}          
+          
 
-      # 2. Deploy the Bicep file
+      # 3. Deploy the Bicep file
       - name: Deploy Bicep File
         uses: azure/cli@v2
         with:
