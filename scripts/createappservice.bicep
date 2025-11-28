@@ -1,4 +1,4 @@
-param webAppName string = 'MicroGateway3'
+param webAppName1 string = 'MicroGateway3'
 param webAppName2 string = 'MicroAgent3'
 param appServicePlanName string = 'MicroPlan3'
 param location string = resourceGroup().location
@@ -24,8 +24,8 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 
 
 // --- 2. Web App (Equivalent to 'az webapp create') ---
-resource webApp 'Microsoft.Web/sites@2022-09-01' = {
-  name: webAppName
+resource webApp1 'Microsoft.Web/sites@2022-09-01' = {
+  name: webAppName1
   location: location
   // Link the Web App to the App Service Plan using the ID reference
   properties: {
@@ -47,7 +47,7 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
 
 
 // --- 3. Web App (Equivalent to 'az webapp create') ---
-resource webApp 'Microsoft.Web/sites@2022-09-01' = {
+resource webApp2 'Microsoft.Web/sites@2022-09-01' = {
   name: webAppName2
   location: location
   // Link the Web App to the App Service Plan using the ID reference
