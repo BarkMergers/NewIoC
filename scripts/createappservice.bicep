@@ -1,5 +1,5 @@
-param webAppName string = 'MicroGateway2'
-param appServicePlanName string = 'MicroPlan2'
+param webAppName string = 'MicroGateway3'
+param appServicePlanName string = 'MicroPlan3'
 param location string = resourceGroup().location
 param skuName string = 'B1' // B1 = Basic tier, size 1
 param dotnetVersion string = 'DOTNET|9.0' // Specification for .NET 9 on Linux
