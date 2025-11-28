@@ -113,6 +113,8 @@ var microservices = [
 
 
 
+
+
 // --- 2. Web App Iteration (Equivalent to 'az webapp create') ---
 resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservices: {
   name: service.name 
