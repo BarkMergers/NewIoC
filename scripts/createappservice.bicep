@@ -129,6 +129,11 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservice
 
 
 
+// Parameter for existing Key Vault name
+param keyVaultName string
+
+
+
 
 
 
