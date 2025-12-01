@@ -8,3 +8,6 @@ az ad sp create-for-rbac --name "github-actions-sp" --role contributor --scopes 
 
 
 
+
+
+az ad sp create-for-rbac --name "github-actions-sp" --role Contributor --scopes /subscriptions/b9144b57-a2c0-4fe8-80ab-10fe51d32287 --json-auth

@@ -129,55 +129,6 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservice
 
 
 
-// Parameter for existing Key Vault name
-param keyVaultName string
-
-
-
-
-
-
-// Use a different API version for the Key Vault that supports defining accessPolicies as an array
-// The newer API version forces the use of 'add', 'remove', or 'replace' actions.
-resource existingKeyVault 'Microsoft.KeyVault/vaults@2019-09-01' existing = {
-  name: keyVaultName
-}
-
-// ----------------------------------------------------------------------------------------
-// --- FIX: Create an array variable containing all access policies from the 'for' loop ---
-// ----------------------------------------------------------------------------------------
-var newAccessPolicies = [for (service, i) in microservices: {
-  tenantId: subscription().tenantId
-  objectId: webApps[i].identity.principalId // Use the principal ID of the Web App
-  permissions: {
-    secrets: [
-      'get' // Only need 'get' to read secrets referenced in app settings
-    ]
-  }
-}]
-
-// ----------------------------------------------------------------------------------------
-// --- FIX: Reference the Key Vault and use a symbolic name for the access policy resource ---
-// ----------------------------------------------------------------------------------------
-// You are now modifying the Key Vault resource itself, not creating a separate one.
-resource keyVaultPolicyUpdate 'Microsoft.KeyVault/vaults@2019-09-01' = {
-  name: keyVaultName
-  location: existingKeyVault.location
-  properties: {
-    // Retain existing properties, if any (this is crucial for Key Vault updates!)
-    sku: {
-      family: existingKeyVault.properties.sku.family
-      name: existingKeyVault.properties.sku.name
-    }
-    tenantId: existingKeyVault.properties.tenantId
-    
-    // Add the new policies to the existing policies
-    accessPolicies: concat(existingKeyVault.properties.accessPolicies, newAccessPolicies)
-  }
-}
-
-
-
 
 
 // output webAppUrl string = webApp1.properties.defaultHostName
