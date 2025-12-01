@@ -188,11 +188,12 @@ resource originGroup 'Microsoft.Cdn/profiles/originGroups@2023-05-01' = {
       probeProtocol: 'Https'
       probeRequestType: 'HEAD'
     }
-    // Defines the MicroGateway4 App Service as the Origin
-    origins: [
+    // 👇 **FIX: Change 'origins' to 'components'**
+    components: [ 
       {
         name: 'ukWestGatewayOrigin'
-        properties: {
+        // This inner block defines the origin properties
+        properties: { 
           hostName: apiGatewayHostName // Dynamically linked to MicroGateway4's hostname
           httpPort: 80
           httpsPort: 443
