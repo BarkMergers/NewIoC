@@ -3,42 +3,11 @@ param location string = resourceGroup().location
 param skuName string = 'B1' // B1 = Basic tier, size 1
 param dotnetVersion string = 'DOTNET|9.0' // Specification for .NET 9 on Linux
 
-
-
-
-// --- 1. App Service Plan (Equivalent to 'az appservice plan create') ---
-resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
-  name: appServicePlanName
-  location: location
-  sku: {
-    name: skuName // e.g., 'B1'
-  }
-  kind: 'Windows' // Assuming dotnet:9 means a Linux container for modern .NET
-  properties: {
-    reserved: false // Required for Linux plans
-  }
-}
-
-
-
-
-// param KeystoneDBConnection string = '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneDBConnection)'
-// param MaintenanceDBConnection string = '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/MaintenanceDBConnection)'
-// param KeystoneHasherKey string = '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/KeystoneHasherKey/aa2d250dc55c461fa65f062ef859d90a)'
-// param OpenAIKey string = '@Microsoft.KeyVault(SecretUri=https://microkeyvault2.vault.azure.net/secrets/OpenAIKey)'
-
-
-
+// Application Settings (Hardcoded for now, but KeyVault is recommended)
 param KeystoneDBConnection string = 'Server=tcp:eriksondb.database.windows.net,1433;Initial Catalog=erikson-system-datbase;Persist Security Info=False;User ID=erikson;Password=MyStr0ngP@ssword!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
 param MaintenanceDBConnection string = 'Server=tcp:eriksondb.database.windows.net,1433;Initial Catalog=erikson-system-datbase;Persist Security Info=False;User ID=erikson;Password=MyStr0ngP@ssword!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
 param KeystoneHasherKey string = 'O5jmvvEQ7QET9RH6jjsW5/d7oL3Jbg3qFx4A6LvDsgg='
-param OpenAIKey string = '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'
-
-
-
-
-
-
+param OpenAIKey string = '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'
 
 // Repeating data to configure the micro services
 var microservices = [
@@ -93,44 +62,34 @@ var microservices = [
   }
 ]
 
+// --- 1. App Service Plan (Fixed: Switched to Linux kind) ---
+resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
+  name: appServicePlanName
+  location: location
+  sku: {
+    name: skuName // e.g., 'B1'
+  }
+  kind: 'Linux' // <-- CORRECTED: For modern .NET/containers, this should be Linux
+  properties: {
+    reserved: true // <-- CORRECTED: Required for Linux plans
+  }
+}
 
-
-///// Latest version of file
-
-
-
-// param webAppName string = 'MicroGateway22'
-// param applicationInsightsName string = 'microgateway2'
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// --- 2. Microservice App Services ---
 resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservices: {
-  name: service.name 
+  name: service.name
   location: location
   identity: {
     type: 'SystemAssigned' // This creates and enables the Managed Identity
-  }  
+  }
   properties: {
     serverFarmId: appServicePlan.id
     
     siteConfig: {
-
+      // General Configuration
       minTlsVersion: '1.2'
-
+      linuxFxVersion: dotnetVersion // e.g., 'DOTNET|9.0'
+      // Application Settings
       appSettings: [
         {
           name: 'KeystoneDBConnection'
@@ -139,7 +98,7 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservice
         {
           name: 'MaintenanceDBConnection'
           value: string(MaintenanceDBConnection)
-        }		
+        }
         {
           name: 'KeystoneHasherKey'
           value: string(KeystoneHasherKey)
@@ -147,47 +106,32 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservice
         {
           name: 'OpenAIKey'
           value: string(OpenAIKey)
-        }		
+        }
+        {
+          name: 'WEBSITES_PORT'
+          value: string(service.port) // Ensure the port is exposed
+        }
       ]
     }
     httpsOnly: true
   }
 }]
 
-
-
-
-
-
-
-// output webAppUrl string = webApp1.properties.defaultHostName
-
-
-
-
-
-
-
-
-
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
-
-
-
+// --- FRONT DOOR CONFIGURATION ---
 
 param frontDoorProfileName string = 'FrontDoorKeystone4'
-param apiGatewayHostName string = 'microgateway4.azurewebsites.net' // Replace with your actual API Gateway hostname
-param endpointName string = 'keystone-endpoint-4' // A friendly name for your Front Door endpoint
+param endpointName string = 'keystone-endpoint-4'
 
-// --- Front Door is a global service; location must be 'global' ---
-resource frontDoorProfile 'Microsoft.Cdn/profiles@2024-06-01' = {
+// Dynamic variable to get the actual hostname of the deployed MicroGateway4 App Service
+// MicroGateway4 is the first item in the 'webApps' array (index 0).
+var apiGatewayHostName = webApps[0].properties.defaultHostName
+
+// --- Front Door Profile (using stable API version 2023-05-01) ---
+resource frontDoorProfile 'Microsoft.Cdn/profiles@2023-05-01' = {
   name: frontDoorProfileName
-  location: 'global'
+  location: 'global' // Front Door is a global service
   sku: {
     name: 'Standard_AzureFrontDoor'
   }
@@ -197,18 +141,18 @@ resource frontDoorProfile 'Microsoft.Cdn/profiles@2024-06-01' = {
   }
 }
 
-// --- 1. Endpoint: The public-facing entry point (e.g., https://<endpoint>.z01.azurefd.net) ---
-resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2024-06-01' = {
+// --- 1. Endpoint ---
+resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2023-05-01' = {
   parent: frontDoorProfile
   name: endpointName
-  location: 'global' // Endpoints are also global
+  location: 'global'
   properties: {
     enabledState: 'Enabled'
   }
 }
 
-// --- 2. Origin Group: Holds one or more origins (API Gateways) ---
-resource originGroup 'Microsoft.Cdn/profiles/originGroups@2024-06-01' = {
+// --- 2. Origin Group ---
+resource originGroup 'Microsoft.Cdn/profiles/originGroups@2023-05-01' = {
   parent: frontDoorProfile
   name: 'apiGatewayOriginGroup'
   properties: {
@@ -216,56 +160,50 @@ resource originGroup 'Microsoft.Cdn/profiles/originGroups@2024-06-01' = {
       sampleSize: 4
       successfulSamplesRequired: 3
     }
-    // 💡 IMPORTANT: The health probe is how AFD determines if your UK West gateway is healthy.
+    // Health Probe for your API Gateway
     healthProbeSettings: {
-      probePath: '/health' // Ensure your API Gateway has a health endpoint!
+      probePath: '/health'
       probeIntervalInSeconds: 100
       probeProtocol: 'Https'
       probeRequestType: 'HEAD'
     }
-    // Defines the actual API Gateway as the Origin
+    // Defines the MicroGateway4 App Service as the Origin
     origins: [
       {
         name: 'ukWestGatewayOrigin'
         properties: {
-          hostName: apiGatewayHostName // e.g., microgateway2.azurewebsites.net
+          hostName: apiGatewayHostName // Dynamically linked to MicroGateway4's hostname
           httpPort: 80
           httpsPort: 443
           originHostHeader: apiGatewayHostName
           priority: 1
           weight: 1000
-          // The App Service in UK West is the target
-          // This type can be AppService, PrivateLink, or Custom
-          originType: 'AppService' 
+          originType: 'AppService'
           enforceCertificateVerification: true
           enabledState: 'Enabled'
-          
-          // You can optionally add the resource ID if it's in the same subscription
-          // resourceId: '/subscriptions/your-sub/resourceGroups/your-rg/providers/Microsoft.Web/sites/MicroGateway22'
+          // Resource ID link to the gateway app service
+          resourceId: webApps[0].id
         }
       }
     ]
   }
 }
 
-// --- 3. Route: Maps incoming traffic (from Endpoint) to the Origin Group ---
-resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-06-01' = {
+// --- 3. Route: Maps Endpoint traffic to the Origin Group ---
+resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2023-05-01' = {
   parent: endpoint
   name: 'defaultRoute'
   properties: {
-    // 🔑 Specifies that all traffic goes to this origin group
     originGroup: {
       id: originGroup.id
     }
-    // Accept all incoming hostnames and paths
     supportedProtocols: [
       'Http'
       'Https'
     ]
     patternsToMatch: [
-      '/*' // Match all paths (e.g., /api/data)
+      '/*' // Route all paths to the gateway
     ]
-    // Default cache settings for API traffic
     forwardingProtocol: 'MatchRequest'
     linkToDefaultDomain: true
     cdnSettings: {
@@ -276,28 +214,5 @@ resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-06-01' = {
   }
 }
 
+// Output the generated Front Door hostname
 output frontDoorHostname string = '${endpoint.name}-${frontDoorProfile.name}.azurefd.net'
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////
-
-
-
