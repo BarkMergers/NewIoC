@@ -38,6 +38,8 @@ param OpenAIKey string = 'sk-proj-brCokhCIO3a3TgLXe9KTrvM7Uy40H1DNfsHF89x4IwJVn6
 
 
 
+
+
 // Repeating data to configure the micro services
 var microservices = [
   {
@@ -159,3 +161,143 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservice
 
 
 // output webAppUrl string = webApp1.properties.defaultHostName
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+param frontDoorProfileName string = 'FrontDoorKeystone4'
+param apiGatewayHostName string = 'microgateway4.azurewebsites.net' // Replace with your actual API Gateway hostname
+param endpointName string = 'keystone-endpoint-4' // A friendly name for your Front Door endpoint
+
+// --- Front Door is a global service; location must be 'global' ---
+resource frontDoorProfile 'Microsoft.Cdn/profiles@2024-06-01' = {
+  name: frontDoorProfileName
+  location: 'global'
+  sku: {
+    name: 'Standard_AzureFrontDoor'
+  }
+  kind: 'frontdoor'
+  properties: {
+    originResponseTimeoutSeconds: 60
+  }
+}
+
+// --- 1. Endpoint: The public-facing entry point (e.g., https://<endpoint>.z01.azurefd.net) ---
+resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2024-06-01' = {
+  parent: frontDoorProfile
+  name: endpointName
+  location: 'global' // Endpoints are also global
+  properties: {
+    enabledState: 'Enabled'
+  }
+}
+
+// --- 2. Origin Group: Holds one or more origins (API Gateways) ---
+resource originGroup 'Microsoft.Cdn/profiles/originGroups@2024-06-01' = {
+  parent: frontDoorProfile
+  name: 'apiGatewayOriginGroup'
+  properties: {
+    loadBalancingSettings: {
+      sampleSize: 4
+      successfulSamplesRequired: 3
+    }
+    // 💡 IMPORTANT: The health probe is how AFD determines if your UK West gateway is healthy.
+    healthProbeSettings: {
+      probePath: '/health' // Ensure your API Gateway has a health endpoint!
+      probeIntervalInSeconds: 100
+      probeProtocol: 'Https'
+      probeRequestType: 'HEAD'
+    }
+    // Defines the actual API Gateway as the Origin
+    origins: [
+      {
+        name: 'ukWestGatewayOrigin'
+        properties: {
+          hostName: apiGatewayHostName // e.g., microgateway2.azurewebsites.net
+          httpPort: 80
+          httpsPort: 443
+          originHostHeader: apiGatewayHostName
+          priority: 1
+          weight: 1000
+          // The App Service in UK West is the target
+          // This type can be AppService, PrivateLink, or Custom
+          originType: 'AppService' 
+          enforceCertificateVerification: true
+          enabledState: 'Enabled'
+          
+          // You can optionally add the resource ID if it's in the same subscription
+          // resourceId: '/subscriptions/your-sub/resourceGroups/your-rg/providers/Microsoft.Web/sites/MicroGateway22'
+        }
+      }
+    ]
+  }
+}
+
+// --- 3. Route: Maps incoming traffic (from Endpoint) to the Origin Group ---
+resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2024-06-01' = {
+  parent: endpoint
+  name: 'defaultRoute'
+  properties: {
+    // 🔑 Specifies that all traffic goes to this origin group
+    originGroup: {
+      id: originGroup.id
+    }
+    // Accept all incoming hostnames and paths
+    supportedProtocols: [
+      'Http'
+      'Https'
+    ]
+    patternsToMatch: [
+      '/*' // Match all paths (e.g., /api/data)
+    ]
+    // Default cache settings for API traffic
+    forwardingProtocol: 'MatchRequest'
+    linkToDefaultDomain: true
+    cdnSettings: {
+      queryStringCachingBehavior: 'IgnoreQueryString'
+      isCompressionEnabled: false
+    }
+    enabledState: 'Enabled'
+  }
+}
+
+output frontDoorHostname string = '${endpoint.name}-${frontDoorProfile.name}.azurefd.net'
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////
+
+
+
