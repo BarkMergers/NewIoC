@@ -171,7 +171,6 @@ resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2023-05-01' = {
 
 
 
-
 // --- 2. Origin Group ---
 resource originGroup 'Microsoft.Cdn/profiles/originGroups@2023-05-01' = {
   parent: frontDoorProfile
@@ -188,13 +187,12 @@ resource originGroup 'Microsoft.Cdn/profiles/originGroups@2023-05-01' = {
       probeProtocol: 'Https'
       probeRequestType: 'HEAD'
     }
-    // 👇 **FIX: Change 'origins' to 'components'**
-    components: [ 
+    // 👇 **FIX: Change 'components' back to 'origins'**
+    origins: [
       {
         name: 'ukWestGatewayOrigin'
-        // This inner block defines the origin properties
-        properties: { 
-          hostName: apiGatewayHostName // Dynamically linked to MicroGateway4's hostname
+        properties: {
+          hostName: apiGatewayHostName
           httpPort: 80
           httpsPort: 443
           originHostHeader: apiGatewayHostName
@@ -203,7 +201,6 @@ resource originGroup 'Microsoft.Cdn/profiles/originGroups@2023-05-01' = {
           originType: 'AppService'
           enforceCertificateVerification: true
           enabledState: 'Enabled'
-          // Resource ID link to the gateway app service
           resourceId: webApps[0].id
         }
       }
