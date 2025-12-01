@@ -143,9 +143,10 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
     clientCertMode: 'Required'
     publicNetworkAccess: 'Enabled'
 
+
     // You can only set the VNet Subnet ID after the VNet and Subnet exist.
     // Assuming the VNet and Subnet are defined elsewhere.
-    virtualNetworkSubnetId: '/subscriptions/b9144b57-a2c0-4fe8-80ab-10fe51d32287/resourceGroups/MicroGroup2/providers/Microsoft.Network/virtualNetworks/micro-vnet/subnets/AppServiceSubnet'
+    // virtualNetworkSubnetId: '/subscriptions/b9144b57-a2c0-4fe8-80ab-10fe51d32287/resourceGroups/MicroGroup2/providers/Microsoft.Network/virtualNetworks/micro-vnet/subnets/AppServiceSubnet'
 
   }
 }
