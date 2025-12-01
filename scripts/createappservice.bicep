@@ -1,4 +1,4 @@
-param appServicePlanName string = 'MicroPlan3'
+param appServicePlanName string = 'MicroPlan4'
 param location string = resourceGroup().location
 param skuName string = 'B1' // B1 = Basic tier, size 1
 param dotnetVersion string = 'DOTNET|9.0' // Specification for .NET 9 on Linux
@@ -41,49 +41,49 @@ param OpenAIKey string = 'sk-proj-brCokhCIO3a3TgLXe9KTrvM7Uy40H1DNfsHF89x4IwJVn6
 // Repeating data to configure the micro services
 var microservices = [
   {
-    name: 'MicroGateway'
+    name: 'MicroGateway4'
     port: 8080
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
     }
   }
   {
-    name: 'MicroAccount3'
+    name: 'MicroAccount4'
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
     }
   }
   {
-    name: 'MicroAgent3'
+    name: 'MicroAgent4'
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
     }
   }
   {
-    name: 'MicroAsset3'
+    name: 'MicroAsset4'
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
     }
   }
   {
-    name: 'MicroCustomer3'
+    name: 'MicroCustomer4'
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
     }
   }
   {
-    name: 'MicroFines3'
+    name: 'MicroFines4'
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
     }
   }
   {
-    name: 'MicroTenant3'
+    name: 'MicroTenant4'
     port: 8081
     settings: {
       ASPNETCORE_ENVIRONMENT: 'Staging'
@@ -97,64 +97,9 @@ var microservices = [
 
 
 
-param webAppName string = 'MicroGateway22'
+// param webAppName string = 'MicroGateway22'
 // param applicationInsightsName string = 'microgateway2'
 
-
-
-
-
-
-// 2. App Service (Web App)
-resource webApp 'Microsoft.Web/sites@2022-09-01' = {
-  name: webAppName
-  location: location
-  identity: {
-    type: 'SystemAssigned' // Enables Managed Identity
-  }
-  
-  // The 'kind' property in the App Service resource should be 'app'
-  kind: 'app'
-
-
-  
-  properties: {
-    // Link to the Windows App Service Plan
-    serverFarmId: appServicePlan.id 
-    
-    // Explicitly confirm it is not Linux, and link to App Insights
-    siteConfig: {
-      // NetFrameworkVersion is commonly used for Windows apps, but 
-      // leaving it null often defaults to the latest supported runtime.
-      // netFrameworkVersion: 'v8.0' // Example for .NET 8.0, if needed
-
-      // These app settings enable Application Insights integration
-      appSettings: [
-        {
-          name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
-          value: 'true' // Recommended for deployment pipeline
-        }
-      ]
-    }
-
-
-    // Set other properties as seen in your JSON:
-    httpsOnly: false // Your JSON showed 'httpsOnly: false'
-    reserved: false // For Windows
-    clientAffinityEnabled: true
-    clientCertMode: 'Required'
-    publicNetworkAccess: 'Enabled'
-
-
-    // You can only set the VNet Subnet ID after the VNet and Subnet exist.
-    // Assuming the VNet and Subnet are defined elsewhere.
-    // virtualNetworkSubnetId: '/subscriptions/b9144b57-a2c0-4fe8-80ab-10fe51d32287/resourceGroups/MicroGroup2/providers/Microsoft.Network/virtualNetworks/micro-vnet/subnets/AppServiceSubnet'
-
-  }
-}
-
-// Optional: Output the default URL for easy access
-output defaultHostname string = webApp.properties.defaultHostName
 
 
 
@@ -183,7 +128,6 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservice
     siteConfig: {
 
       minTlsVersion: '1.2'
-
 
       appSettings: [
         {
