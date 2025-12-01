@@ -13,9 +13,9 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   sku: {
     name: skuName // e.g., 'B1'
   }
-  kind: 'linux' // Assuming dotnet:9 means a Linux container for modern .NET
+  kind: 'Windows' // Assuming dotnet:9 means a Linux container for modern .NET
   properties: {
-    reserved: true // Required for Linux plans
+    reserved: false // Required for Linux plans
   }
 }
 
