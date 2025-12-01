@@ -115,10 +115,7 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
   // The 'kind' property in the App Service resource should be 'app'
   kind: 'app'
 
-  // The 'tags' are used to link the App Insights resource
-  tags: {
-    'hidden-link: /app-insights-resource-id': appInsights.id
-  }
+
   
   properties: {
     // Link to the Windows App Service Plan
@@ -132,18 +129,6 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
 
       // These app settings enable Application Insights integration
       appSettings: [
-        {
-          name: 'APPINSIGHTS_INSTRUMENTATIONKEY'
-          value: appInsights.properties.InstrumentationKey
-        }
-        {
-          name: 'APPLICATIONINSIGHTS_CONNECTION_STRING'
-          value: appInsights.properties.ConnectionString
-        }
-        {
-          name: 'ApplicationInsightsAgent_EXTENSION_VERSION'
-          value: '~3' // Auto-inject the latest extension
-        }
         {
           name: 'SCM_DO_BUILD_DURING_DEPLOYMENT'
           value: 'true' // Recommended for deployment pipeline
