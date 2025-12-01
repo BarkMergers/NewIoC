@@ -107,7 +107,7 @@ resource webApps 'Microsoft.Web/sites@2022-09-01' = [for service in microservice
     serverFarmId: appServicePlan.id
     
     siteConfig: {
-      linuxFxVersion: dotnetVersion
+
       minTlsVersion: '1.2'
 
 
