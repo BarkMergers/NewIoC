@@ -158,20 +158,20 @@ resource frontDoorProfile 'Microsoft.Cdn/profiles@2023-05-01' = {
 
 
 
+// --- 1. Endpoint ---
+resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2023-05-01' = {
+  parent: frontDoorProfile
+  name: endpointName
+  location: 'global'
+  properties: {
+    enabledState: 'Enabled'
+  }
+}
 
 
-//
-//
-//// --- 1. Endpoint ---
-//resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2023-05-01' = {
-//  parent: frontDoorProfile
-//  name: endpointName
-//  location: 'global'
-//  properties: {
-//    enabledState: 'Enabled'
-//  }
-//}
-//
+
+
+
 //// --- 2. Origin Group ---
 //resource originGroup 'Microsoft.Cdn/profiles/originGroups@2023-05-01' = {
 //  parent: frontDoorProfile
