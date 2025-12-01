@@ -14,6 +14,7 @@ env:
   AZURE_LOCATION: 'ukwest' # Change this to your desired Azure region
   AZURE_DEPLOYMENT_NAME: 'deploy-${{ github.sha }}' # Use a unique name based on the commit hash
 
+
 jobs:
   deploy-bicep:
     runs-on: ubuntu-latest

@@ -136,6 +136,7 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
       ]
     }
 
+
     // Set other properties as seen in your JSON:
     httpsOnly: false // Your JSON showed 'httpsOnly: false'
     reserved: false // For Windows
