@@ -154,81 +154,89 @@ resource frontDoorProfile 'Microsoft.Cdn/profiles@2023-05-01' = {
   }
 }
 
-// --- 1. Endpoint ---
-resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2023-05-01' = {
-  parent: frontDoorProfile
-  name: endpointName
-  location: 'global'
-  properties: {
-    enabledState: 'Enabled'
-  }
-}
 
-// --- 2. Origin Group ---
-resource originGroup 'Microsoft.Cdn/profiles/originGroups@2023-05-01' = {
-  parent: frontDoorProfile
-  name: 'apiGatewayOriginGroup'
-  properties: {
-    loadBalancingSettings: {
-      sampleSize: 4
-      successfulSamplesRequired: 3
-    }
-    // Health Probe for your API Gateway
-    healthProbeSettings: {
-      probePath: '/health'
-      probeIntervalInSeconds: 100
-      probeProtocol: 'Https'
-      probeRequestType: 'HEAD'
-    }
-    // Defines the MicroGateway4 App Service as the Origin
-    origins: [
-      {
-        name: 'ukWestGatewayOrigin'
-        properties: {
-          hostName: apiGatewayHostName // Dynamically linked to MicroGateway4's hostname
-          httpPort: 80
-          httpsPort: 443
-          originHostHeader: apiGatewayHostName
-          priority: 1
-          weight: 1000
-          originType: 'AppService'
-          enforceCertificateVerification: true
-          enabledState: 'Enabled'
-          // Resource ID link to the gateway app service
-          resourceId: webApps[0].id
-        }
-      }
-    ]
-  }
-}
 
-// --- 3. Route: Maps Endpoint traffic to the Origin Group ---
-resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2023-05-01' = {
-  parent: endpoint
-  name: 'defaultRoute'
-  properties: {
-    originGroup: {
-      id: originGroup.id
-    }
-    supportedProtocols: [
-      'Http'
-      'Https'
-    ]
-    patternsToMatch: [
-      '/*' // Route all paths to the gateway
-    ]
-    forwardingProtocol: 'MatchRequest'
-    linkToDefaultDomain: true
-    cdnSettings: {
-      queryStringCachingBehavior: 'IgnoreQueryString'
-      isCompressionEnabled: false
-    }
-    enabledState: 'Enabled'
-  }
-}
 
-// Output the generated Front Door hostname
-output frontDoorHostname string = '${endpoint.name}-${frontDoorProfile.name}.azurefd.net'
+
+
+
+//
+//
+//// --- 1. Endpoint ---
+//resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2023-05-01' = {
+//  parent: frontDoorProfile
+//  name: endpointName
+//  location: 'global'
+//  properties: {
+//    enabledState: 'Enabled'
+//  }
+//}
+//
+//// --- 2. Origin Group ---
+//resource originGroup 'Microsoft.Cdn/profiles/originGroups@2023-05-01' = {
+//  parent: frontDoorProfile
+//  name: 'apiGatewayOriginGroup'
+//  properties: {
+//    loadBalancingSettings: {
+//      sampleSize: 4
+//      successfulSamplesRequired: 3
+//    }
+//    // Health Probe for your API Gateway
+//    healthProbeSettings: {
+//      probePath: '/health'
+//      probeIntervalInSeconds: 100
+//      probeProtocol: 'Https'
+//      probeRequestType: 'HEAD'
+//    }
+//    // Defines the MicroGateway4 App Service as the Origin
+//    origins: [
+//      {
+//        name: 'ukWestGatewayOrigin'
+//        properties: {
+//          hostName: apiGatewayHostName // Dynamically linked to MicroGateway4's hostname
+//          httpPort: 80
+//          httpsPort: 443
+//          originHostHeader: apiGatewayHostName
+//          priority: 1
+//          weight: 1000
+//          originType: 'AppService'
+//          enforceCertificateVerification: true
+//          enabledState: 'Enabled'
+//          // Resource ID link to the gateway app service
+//          resourceId: webApps[0].id
+//        }
+//      }
+//    ]
+//  }
+//}
+//
+//// --- 3. Route: Maps Endpoint traffic to the Origin Group ---
+//resource route 'Microsoft.Cdn/profiles/afdEndpoints/routes@2023-05-01' = {
+//  parent: endpoint
+//  name: 'defaultRoute'
+//  properties: {
+//    originGroup: {
+//      id: originGroup.id
+//    }
+//    supportedProtocols: [
+//      'Http'
+//      'Https'
+//    ]
+//    patternsToMatch: [
+//      '/*' // Route all paths to the gateway
+//    ]
+//    forwardingProtocol: 'MatchRequest'
+//    linkToDefaultDomain: true
+//    cdnSettings: {
+//      queryStringCachingBehavior: 'IgnoreQueryString'
+//      isCompressionEnabled: false
+//    }
+//    enabledState: 'Enabled'
+//  }
+//}
+//
+//// Output the generated Front Door hostname
+//output frontDoorHostname string = '${endpoint.name}-${frontDoorProfile.name}.azurefd.net'
 
 
 
