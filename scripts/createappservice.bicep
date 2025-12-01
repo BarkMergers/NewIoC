@@ -30,7 +30,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 
 param KeystoneDBConnection string = 'Server=tcp:eriksondb.database.windows.net,1433;Initial Catalog=erikson-system-datbase;Persist Security Info=False;User ID=erikson;Password=MyStr0ngP@ssword!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
 param MaintenanceDBConnection string = 'Server=tcp:eriksondb.database.windows.net,1433;Initial Catalog=erikson-system-datbase;Persist Security Info=False;User ID=erikson;Password=MyStr0ngP@ssword!;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
-param KeystoneHasherKey string = 'O5jmvvEQ7QET9RH6jjsW5/d7oL3Jbg3qFx4A6LvDsgg='
+param KeystoneHasherKey string = ''
 param OpenAIKey string = ''
 
 
