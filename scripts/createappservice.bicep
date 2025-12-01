@@ -35,6 +35,8 @@ param OpenAIKey string = 'sk-proj-brCokhCIO3a3TgLXe9KTrvM7Uy40H1DNfsHF89x4IwJVn6
 
 
 
+
+
 // Repeating data to configure the micro services
 var microservices = [
   {
