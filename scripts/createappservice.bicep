@@ -28,7 +28,6 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
 
 
 
-
 // Repeating data to configure the micro services
 var microservices = [
   {
@@ -222,7 +221,7 @@ resource ukWestGatewayOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2023-0
     // If you are using Azure Front Door Standard/Premium (which this API version implies):
     // The following properties may need slight adjustments depending on the specific product tier/API version.
     // resourceId: webApps[0].id // <-- This is what links it to the App Service
-    enforceCertificateVerification: true
+    //enforceCertificateVerification: true
     enabledState: 'Enabled'
   }
 }
