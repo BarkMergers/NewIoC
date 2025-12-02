@@ -172,43 +172,60 @@ resource endpoint 'Microsoft.Cdn/profiles/afdEndpoints@2023-05-01' = {
 
 
 // --- 2. Origin Group ---
-//resource originGroup 'Microsoft.Cdn/profiles/originGroups@2023-05-01' = {
-//  parent: frontDoorProfile
-//  name: 'apiGatewayOriginGroup'
-//  properties: {
-//    loadBalancingSettings: {
-//      sampleSize: 4
-//      successfulSamplesRequired: 3
-//    }
-//    // Health Probe for your API Gateway
-//    healthProbeSettings: {
-//      probePath: '/health'
-//      probeIntervalInSeconds: 100
-//      probeProtocol: 'Https'
-//      probeRequestType: 'HEAD'
-//    }
-//    // 👇 **FIX: Change 'components' back to 'origins'**
-//    origins: [
-//      {
-//        name: 'ukWestGatewayOrigin'
-//        properties: {
-//          hostName: apiGatewayHostName
-//          httpPort: 80
-//          httpsPort: 443
-//          originHostHeader: apiGatewayHostName
-//          priority: 1
-//          weight: 1000
-//          originType: 'AppService'
-//          enforceCertificateVerification: true
-//          enabledState: 'Enabled'
-//          resourceId: webApps[0].id
-//        }
-//      }
-//    ]
-//  }
-//}
+resource originGroup 'Microsoft.Cdn/profiles/originGroups@2023-05-01' = {
+  parent: frontDoorProfile
+  name: 'apiGatewayOriginGroup'
+  properties: {
+    loadBalancingSettings: {
+      sampleSize: 4
+      successfulSamplesRequired: 3
+    }
+    // Health Probe for your API Gateway
+    healthProbeSettings: {
+      probePath: '/health'
+      probeIntervalInSeconds: 100
+      probeProtocol: 'Https'
+      probeRequestType: 'HEAD'
+    }
+    // 👇 **FIX: Change 'components' back to 'origins'**
+    //origins: [
+    //  {
+    //    name: 'ukWestGatewayOrigin'
+    //    properties: {
+    //      hostName: apiGatewayHostName
+    //      httpPort: 80
+    //      httpsPort: 443
+    //      originHostHeader: apiGatewayHostName
+    //      priority: 1
+    //      weight: 1000
+    //      originType: 'AppService'
+    //      enforceCertificateVerification: true
+    //      enabledState: 'Enabled'
+    //      resourceId: webApps[0].id
+    //    }
+    //  }
+    //]
+  }
+}
 
-
+// --- 3. Origin (Child Resource) ---
+resource ukWestGatewayOrigin 'Microsoft.Cdn/profiles/originGroups/origins@2023-05-01' = {
+  parent: originGroup // This links it as a child
+  name: 'ukWestGatewayOrigin'
+  properties: {
+    hostName: apiGatewayHostName
+    httpPort: 80
+    httpsPort: 443
+    originHostHeader: apiGatewayHostName
+    priority: 1
+    weight: 1000
+    // If you are using Azure Front Door Standard/Premium (which this API version implies):
+    // The following properties may need slight adjustments depending on the specific product tier/API version.
+    // resourceId: webApps[0].id // <-- This is what links it to the App Service
+    enforceCertificateVerification: true
+    enabledState: 'Enabled'
+  }
+}
 
 
 
